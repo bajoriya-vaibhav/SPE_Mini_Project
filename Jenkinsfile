@@ -2,10 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDS = credentials('dockerhub-creds')  // Jenkins credentials (username + password)
         IMAGE_NAME = "spe_mini_calculator"
         IMAGE_TAG = "latest"
-        DOCKER_IMAGE = "${DOCKERHUB_CREDS_USR}/${IMAGE_NAME}:${IMAGE_TAG}"
         EMAIL_ID_TO_SEND = "vaibhav.bajoriya@iiitb.ac.in"
     }
 
@@ -28,16 +26,26 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Build & Push') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE} ."
-            }
-        }
+                // Use withCredentials to safely handle DockerHub secrets
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', 
+                                                  usernameVariable: 'DOCKERHUB_USER', 
+                                                  passwordVariable: 'DOCKERHUB_PASS')]) {
+                    script {
+                        def DOCKER_IMAGE = "${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
 
-        stage('Push Docker Image') {
-            steps {
-                sh "echo ${DOCKERHUB_CREDS_PSW} | docker login -u ${DOCKERHUB_CREDS_USR} --password-stdin"
-                sh "docker push ${DOCKER_IMAGE}"
+                        // Ensure Buildx is available
+                        sh 'docker buildx version || echo "Buildx not found, using legacy builder"'
+
+                        // Docker build
+                        sh "docker build -t ${DOCKER_IMAGE} ."
+
+                        // Docker login & push
+                        sh "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
+                        sh "docker push ${DOCKER_IMAGE}"
+                    }
+                }
             }
         }
 
@@ -47,6 +55,7 @@ pipeline {
             }
         }
     }
+
     post {
         success {
             echo "Successfully executed the pipeline"
