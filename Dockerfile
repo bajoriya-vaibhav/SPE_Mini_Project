@@ -1,12 +1,14 @@
-FROM gcc:latest AS build
+# Use GCC as base image
+FROM gcc:latest
 
+# Set working directory
 WORKDIR /app
+
+# Copy source code
 COPY . /app
 
+# Build the calculator
 RUN make
 
-FROM scratch
-
-COPY --from=build /app/calculator /bin/calc
-
-CMD ["/bin/calc"]
+# Set the default command to run the calculator
+CMD ["/app/calculator"]

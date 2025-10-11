@@ -33,17 +33,17 @@ pipeline {
                                                   usernameVariable: 'DOCKERHUB_USER', 
                                                   passwordVariable: 'DOCKERHUB_PASS')]) {
                     script {
+                        // Define Docker image
                         def DOCKER_IMAGE = "${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
 
-                        // Ensure Buildx is available
-                        sh 'docker buildx version || echo "Buildx not found, using legacy builder"'
+                        // Force legacy builder to avoid Buildx issues
+                        sh "DOCKER_BUILDKIT=0 docker build -t $DOCKER_IMAGE ."
 
-                        // Docker build
-                        sh "docker build -t ${DOCKER_IMAGE} ."
-
-                        // Docker login & push
-                        sh "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
-                        sh "docker push ${DOCKER_IMAGE}"
+                        // Docker login & push securely
+                        sh """
+                            echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+                            docker push $DOCKER_IMAGE
+                        """
                     }
                 }
             }
