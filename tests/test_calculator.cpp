@@ -4,16 +4,16 @@
 
 int main() {
     // Square root
-    assert(Calculator::squareRoot(25) == 5);
+    assert(Calculator::squareRoot(49) == 7);
 
     // Factorial
-    assert(Calculator::factorial(5) == 120);
+    assert(Calculator::factorial(4) == 24);
 
     // Natural log (approximate)
-    assert(abs(Calculator::naturalLog(2.71828) - 1.0) < 0.01);
+    assert(abs(Calculator::naturalLog(2.718280) - 1.0) < 0.01);
 
     // Power
-    assert(Calculator::power(2, 3) == 8);
+    assert(Calculator::power(2, 5) == 32);
 
     std::cout << "All tests passed!" << std::endl;
     return 0;
