@@ -6,14 +6,16 @@
 
     - name: Pull Docker image
       docker_image:
-        name: valmikdocker7/spe_mini_calculator
+        name: inevertheless/spe_mini_calculator
         tag: latest
         source: pull
 
     - name: Run calculator container
       docker_container:
         name: calculator
-        image: valmikdocker7/spe_mini_calculator:latest
+        image: inevertheless/spe_mini_calculator:latest
         state: started
         detach: true
         restart_policy: no
+        ports:
+          - "8080:8080"  # map container port to host port
