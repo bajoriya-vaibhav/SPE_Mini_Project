@@ -1,0 +1,23 @@
+# Git folder
+.git
+
+# Node.js dependencies
+node_modules
+
+# Python virtual environment
+venv
+*.pyc
+
+# Local build artifacts
+build/
+bin/
+obj/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Any large data or media files
+*.zip
+*.mp4
+*.iso
