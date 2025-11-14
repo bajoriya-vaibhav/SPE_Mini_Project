@@ -10,20 +10,23 @@
 # COPY --from=build /app/calculator /bin/calc
 
 # CMD ["/bin/calc"]
-
-FROM gcc:11-alpine AS build
+FROM alpine:latest AS build
 
 WORKDIR /app
+
+# Install build tools
+RUN apk add --no-cache \
+    g++ \
+    make \
+    musl-dev
+
 COPY Makefile .
 COPY include/ include/
 COPY src/ src/
 
-# Install make (Alpine doesn't include it)
-RUN apk add --no-cache make
-
 RUN make
 
-# Final stage remains same
+# Stage 2: Runtime
 FROM scratch
 COPY --from=build /app/calculator /bin/calc
 CMD ["/bin/calc"]
